@@ -2,9 +2,11 @@ import groovy.json.JsonSlurper
 
 def getFtpPublishProfile(def publishProfilesJson) {
   def pubProfiles = new JsonSlurper().parseText(publishProfilesJson)
-  for (p in pubProfiles)
-    if (p['publishMethod'] == 'FTP')
+  for (p in pubProfiles) {
+    if (p['publishMethod'] == 'FTP') {
       return [url: p.publishUrl, username: p.userName, password: p.userPWD]
+    }
+  }
 }
 
 node {
@@ -30,9 +32,9 @@ node {
       }
       // get publish settings
       def pubProfilesJson = sh script: "az webapp deployment list-publishing-profiles -g $resourceGroup -n $webAppName", returnStdout: true
-      def ftpProfile = getFtpPublishProfile pubProfilesJson
+      def ftpProfile = getFtpPublishProfile(pubProfilesJson)
       // upload package
-      sh “az webapp deploy --resource-group jenkins-get-started-rg --name jenkinsrqc --src-path target/calculator-1.0.war --type war”
+      sh "az webapp deploy --resource-group jenkins-get-started-rg --name jenkinsrqc --src-path target/calculator-1.0.war --type war"
       // log out
       sh 'az logout'
     }
